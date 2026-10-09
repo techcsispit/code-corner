@@ -4,4 +4,3 @@
 20 | not prime
 1 | not prime
 15 | not prime
-999999937 | prime
