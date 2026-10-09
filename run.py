@@ -3,7 +3,9 @@
     python run.py               # everything
     python run.py prime         # one problem
 """
+import os
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -39,6 +41,49 @@ def fill(cmd, src, out):
     return [part.format(src=src, out=out) for part in cmd]
 
 
+def run_process(cmd, timeout, input_text=None):
+    """Run a command with a deadline, killing its whole process tree on timeout."""
+    popen_args = {
+        "stdin": subprocess.PIPE if input_text is not None else None,
+        "stdout": subprocess.PIPE,
+        "stderr": subprocess.PIPE,
+        "text": True,
+    }
+
+    if os.name != "nt":
+        popen_args["start_new_session"] = True
+
+    process = subprocess.Popen(cmd, **popen_args)
+    try:
+        stdout, stderr = process.communicate(input=input_text, timeout=timeout)
+        return subprocess.CompletedProcess(
+            cmd, process.returncode, stdout, stderr
+        ), False
+    except subprocess.TimeoutExpired:
+        if os.name == "nt":
+            # terminate() only stops the direct child on Windows. taskkill /T also
+            # stops compilers or solutions that have spawned descendant processes.
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(process.pid)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+                timeout=5,
+            )
+        else:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
+        if process.poll() is None:
+            process.kill()
+        stdout, stderr = process.communicate()
+        return subprocess.CompletedProcess(
+            cmd, process.returncode, stdout, stderr
+        ), True
+
+
 def read_problem_config(problem):
     cases = []
     for line in (problem / "cases.txt").read_text().splitlines():
@@ -66,13 +111,21 @@ def run_solution(src, cases, timeout):
     if shutil.which(tool) is None:
         print(f"  skip  {src.name} ({tool} isn't installed)")
         return [], 0.0, True
+    started = time.perf_counter()
+    deadline = started + timeout
+
     with tempfile.TemporaryDirectory() as out:
         if compile_cmd:
-            result = subprocess.run(
+            result, timed_out = run_process(
                 fill(compile_cmd, src, out),
-                capture_output=True,
-                text=True
+                max(0.001, deadline - time.perf_counter()),
             )
+            if timed_out:
+                return (
+                    [f"took longer than {timeout} seconds while compiling"],
+                    time.perf_counter() - started,
+                    False,
+                )
             if result.returncode != 0:
                 return [f"didn't compile:\n{result.stderr}"], 0.0, False
 
@@ -80,20 +133,26 @@ def run_solution(src, cases, timeout):
         total_time = 0.0
 
         for given, expected in cases:
-            start = time.perf_counter()
-            try:
-                result = subprocess.run(
-                    fill(run_cmd, src, out),
-                    input=given + "\n",
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout
+            remaining = deadline - time.perf_counter()
+            if remaining <= 0:
+                return (
+                    [f"took longer than {timeout} seconds"],
+                    time.perf_counter() - started,
+                    False,
                 )
-                got = result.stdout.strip()
-            except subprocess.TimeoutExpired:
-                got = f"(took longer than {timeout} seconds)"
-            finally:
-                total_time += time.perf_counter() - start
+
+            start = time.perf_counter()
+            result, timed_out = run_process(
+                fill(run_cmd, src, out),
+                remaining,
+                given + "\n",
+            )
+            total_time += time.perf_counter() - start
+
+            if timed_out:
+                return [f"took longer than {timeout} seconds"], total_time, False
+
+            got = result.stdout.strip()
 
             if got != expected:
                 failures.append(

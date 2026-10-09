@@ -21,7 +21,7 @@ The runner reports timing for each solution and shows a final summary:
 Summary: 12 passed, 0 failed, 3 skipped
 ```
 
-Codespaces has all languages installed. By default, solutions timeout after 10 seconds. Individual problems can override this by adding a `timeout.txt` file with the limit in seconds.
+Codespaces has all languages installed. By default, each solution has a total 10-second budget for compilation and all test cases. Individual problems can override this by adding a `timeout.txt` file with the limit in seconds. When the budget expires, the runner stops the solution and any processes it spawned.
 
 ## Layout
 
