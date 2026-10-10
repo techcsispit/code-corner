@@ -15,7 +15,7 @@ PROBLEMS = Path(__file__).parent / "problems"
 # extension -> (tool that must be installed, compile command or None, run command)
 # {src} is the source file, {out} a temp directory for build output.
 LANGUAGES = {
-    ".py": ("python3", None, ["python3", "{src}"]),
+    ".py": (sys.executable, None, [sys.executable, "{src}"]),  # the Python running this script
     ".js": ("node", None, ["node", "{src}"]),
     ".c": ("cc", ["cc", "-O2", "-o", "{out}/prog", "{src}"], ["{out}/prog"]),
     ".cpp": ("c++", ["c++", "-std=c++17", "-O2", "-o", "{out}/prog", "{src}"], ["{out}/prog"]),
