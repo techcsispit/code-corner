@@ -140,7 +140,6 @@ def run_solution(src, cases, timeout):
                     time.perf_counter() - started,
                     False,
                 )
-
             start = time.perf_counter()
             result, timed_out = run_process(
                 fill(run_cmd, src, out),
@@ -153,6 +152,12 @@ def run_solution(src, cases, timeout):
                 return [f"took longer than {timeout} seconds"], total_time, False
 
             got = result.stdout.strip()
+            if result.returncode != 0:
+                detail = result.stderr.strip()
+                message = f"input {given!r}: process exited with status {result.returncode}"
+                if detail:
+                    message += f": {detail}"
+                failures.append(message)
 
             if got != expected:
                 failures.append(
