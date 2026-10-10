@@ -90,6 +90,12 @@ def run_solution(src, cases, timeout):
                     timeout=timeout
                 )
                 got = result.stdout.strip()
+                if result.returncode != 0:
+                    detail = result.stderr.strip()
+                    message = f"input {given!r}: process exited with status {result.returncode}"
+                    if detail:
+                        message += f": {detail}"
+                    failures.append(message)
             except subprocess.TimeoutExpired:
                 got = f"(took longer than {timeout} seconds)"
             finally:
