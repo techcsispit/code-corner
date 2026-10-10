@@ -1,8 +1,8 @@
 import java.util.Scanner;
 
-public class PrimeCheck {
+public class Solution {
 
-    public boolean isPrime(long n) {
+    public static boolean isPrime(long n) {
 
         // 0 and 1 are not prime 
         if (n <= 1) {
