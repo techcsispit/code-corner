@@ -3,3 +3,5 @@ hello | false
 level | true
 abcba | true
 ab | false
+Never odd or even | true
+A man, a plan, a canal: Panama | true
