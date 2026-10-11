@@ -1,15 +1,31 @@
 #include <iostream>
+using namespace std;
 
-bool isPrime(long long n) {
-    if (n < 2) return false;
-    for (long long i = 2; i * i < n; i++) {
-        if (n % i == 0) return false;
+void investigatePrime(int n)
+{
+    if (n < 2)
+    {
+        cout << "Not Prime" << endl;
+        return;
     }
-    return true;
+    for (int i = 2; i < n; i++)
+    {
+        if (n % i == 0)
+        {
+            cout << "not prime" << endl;
+            return;
+        }
+    }
+    cout << "Prime" << endl;
 }
 
-int main() {
-    long long n;
-    std::cin >> n;
-    std::cout << (isPrime(n) ? "prime" : "not prime") << "\n";
+int main()
+{
+
+    int n;
+    cout << "Enter the Whole number: " << endl;
+    cin >> n;
+
+    investigatePrime(n);
+    return 0;
 }
