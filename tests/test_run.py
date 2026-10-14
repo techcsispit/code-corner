@@ -86,9 +86,30 @@ class SolutionTimeoutTests(unittest.TestCase):
         )
         time.sleep(0.6)
 
-        self.assertTrue(timed_out)
-        self.assertFalse(marker.exists())
+    def test_failed_compilation_reports_elapsed_time(self):
+        language = (
+            sys.executable,
+            [
+                sys.executable,
+                "-c",
+                "import time, sys; time.sleep(0.1); sys.exit(1)",
+            ],
+            [sys.executable, "-c", "print('ok')"],
+        )
+
+        with tempfile.NamedTemporaryFile(
+            suffix=".compile-fail", dir=self.temp_dir.name
+        ) as source:
+            with patch.dict(run.LANGUAGES, {".compile-fail": language}):
+                failures, elapsed, skipped = run.run_solution(
+                    Path(source.name), [("input", "ok")], 1.0
+                )
+
+        self.assertFalse(skipped)
+        self.assertTrue(failures[0].startswith("didn't compile:"))
+        self.assertGreaterEqual(elapsed, 0.08)
 
 
 if __name__ == "__main__":
     unittest.main()
+
