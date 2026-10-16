@@ -1,27 +1,27 @@
 #include <stdio.h>
 
-int main() {
-    long long n, count = 0;
-
-    scanf("%lld", &n);
-
-    if (n <= 1) {
-        printf("not prime\n");
+int is_prime(long long n) {
+    if (n < 2) {
         return 0;
     }
+    if (n % 2 == 0) {
+        return n == 2;
+    }
 
-    for (int i = 2; i <= n / 2; i++) {
-        if (n % i == 0) {
-            count++;
-            break;
+    for (long long divisor = 3; divisor <= n / divisor; divisor += 2) {
+        if (n % divisor == 0) {
+            return 0;
         }
     }
 
-    if (count == 0) {
-        printf("prime\n");
-    } else {
-        printf("not prime\n");
-    }
+    return 1;
+}
+
+int main(void) {
+    long long n;
+    scanf("%lld", &n);
+
+    printf("%s\n", is_prime(n) ? "prime" : "not prime");
 
     return 0;
 }

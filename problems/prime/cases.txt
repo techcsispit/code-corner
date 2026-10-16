@@ -6,3 +6,15 @@
 15 | not prime
 9 | not prime
 25 | not prime
+999999937 | prime
+999999929 | prime
+999999893 | prime
+999999883 | prime
+999999797 | prime
+999999761 | prime
+999999757 | prime
+999999751 | prime
+999999739 | prime
+999999733 | prime
+999999677 | prime
+999999667 | prime
