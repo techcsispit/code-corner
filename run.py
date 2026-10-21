@@ -217,6 +217,9 @@ def main():
                 passed += 1
                 print(f"  ok    {src.name} ({total_time:.3f}s)")
     print(f"\nSummary: {passed} passed, {failed} failed, {skipped} skipped")
+    if passed + failed == 0:
+        print("Error: no solutions were executed")
+        sys.exit(1)
     sys.exit(1 if failed else 0)
 
 
