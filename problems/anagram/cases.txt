@@ -2,3 +2,11 @@ listen, silent | true
 Dormitory, Dirty room | true
 hello, world | false
 abc, abcd | false
+a, a | true
+A, a | true
+a, b | false
+aab, abb | false
+Conversation, Voices rant on | true
+School master, The classroom | true
+Debit card, Bad credit | true
+Eleven plus two, Twelve plus one | true
