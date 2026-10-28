@@ -127,7 +127,11 @@ def run_solution(src, cases, timeout):
                     False,
                 )
             if result.returncode != 0:
-                return [f"didn't compile:\n{result.stderr}"], 0.0, False
+                return (
+                    [f"didn't compile:\n{result.stderr}"],
+                    time.perf_counter() - started,
+                    False,
+                )
 
         failures = []
         total_time = 0.0
