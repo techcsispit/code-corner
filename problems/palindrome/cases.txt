@@ -5,3 +5,12 @@ abcba | true
 ab | false
 Never odd or even | true
 A man, a plan, a canal: Panama | true
+a | true
+Z | true
+12321 | true
+12345 | false
+0P | false
+1a2b3b2a1 | true
+No 'x' in Nixon | true
+Was it a car or a cat I saw? | true
+., !? | true
